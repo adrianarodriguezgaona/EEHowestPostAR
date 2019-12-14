@@ -15,4 +15,5 @@ namespace HoWestPost.Domain
             this.travelTime = travelTimeToDestination;
         }
     }
+
 }
