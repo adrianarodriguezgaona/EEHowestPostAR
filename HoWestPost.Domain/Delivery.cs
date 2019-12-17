@@ -6,13 +6,15 @@ namespace HoWestPost.Domain
 {
     public class Delivery
     {
-        private PackageType packageType;
-        private int travelTime;
+        public PackageType PackageType { get; private set; }
+        public int TravelTime { get; private set; }
+        public bool IsPrior { get; private set; }
 
-        public Delivery(PackageType packageType, int travelTimeToDestination)
+        public Delivery(PackageType packageType, int travelTimeToDestination, bool isPriorOrNot)
         {
-            this.packageType = packageType;
-            this.travelTime = travelTimeToDestination;
+            this.PackageType = packageType;
+            this.TravelTime = travelTimeToDestination;
+            this.IsPrior = isPriorOrNot;
         }
     }
 
