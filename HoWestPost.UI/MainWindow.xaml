@@ -10,25 +10,28 @@
         <Label Content="Pakket versturen" HorizontalAlignment="Left" Margin="57,10,0,0" VerticalAlignment="Top" Width="108"/>
         <Label Content="Reistijd" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="-2.437,-1.133"/>
         <ComboBox x:Name="cmbTripTime" HorizontalAlignment="Left" Margin="119,67,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.36,-0.545"/>
-        <CheckBox x:Name="chBoxPrior" Content="Prior?" HorizontalAlignment="Left" Margin="119,124,0,0" VerticalAlignment="Top"/>
+        <CheckBox  x:Name="chBoxPrior"  Content="Prior?" HorizontalAlignment="Left" Margin="119,124,0,0" VerticalAlignment="Top"/>
         <Button x:Name="btnMini" Content="Mini" HorizontalAlignment="Left" Margin="23,180,0,0" VerticalAlignment="Top" Width="48" Click="BtnMini_Click"/>
-        <Button Content="Standaard" HorizontalAlignment="Left" Margin="94,180,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.928,1.323" Click="Button_Click"/>
-        <Button Content="Maxi" HorizontalAlignment="Left" Margin="187,180,0,0" VerticalAlignment="Top" Width="52" Click="Button_Click_1"/>
+        <Button x:Name="btnStandard" Content="Standaard" HorizontalAlignment="Left" Margin="94,180,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.928,1.323" Click="BtnStandard_Click"/>
+        <Button x:Name="btnMaxi" Content="Maxi" HorizontalAlignment="Left" Margin="187,180,0,0" VerticalAlignment="Top" Width="52" Click="BtnMaxi_Click"/>
         <Label Content="In behandeling" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Width="109"/>
         <Label Content="Onderweg" HorizontalAlignment="Left" Margin="633,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.708,-0.539" Width="102"/>
         <ProgressBar x:Name="prgBarTime" HorizontalAlignment="Left" Height="24" Margin="550,136,0,0" VerticalAlignment="Top" Width="210"/>
         <Label Content="Totale reistijd" HorizontalAlignment="Left" Margin="550,195,0,0" VerticalAlignment="Top" Width="86"/>
-        <Label x:Name="lblTripTime" Content="Label" HorizontalAlignment="Left" Margin="670,195,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.521,0.945" Width="90"/>
+        <Label x:Name="lblTripTime" HorizontalAlignment="Left" Margin="670,195,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.521,0.945" Width="90"/>
         <Label Content="Pakket type" HorizontalAlignment="Left" Margin="550,226,0,0" VerticalAlignment="Top" Width="77"/>
-        <Label x:Name="lblPakketType" Content="Label" HorizontalAlignment="Left" Margin="670,226,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.083,0.227"/>
+        <Label x:Name="lblPakketType" HorizontalAlignment="Left" Margin="670,226,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.083,0.227"/>
         <Label Content="Prior?" HorizontalAlignment="Left" Margin="550,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.542,-0.086" Width="77"/>
-        <Label x:Name="lblPrior" Content="Label" HorizontalAlignment="Left" Margin="670,265,0,0" VerticalAlignment="Top" Width="54"/>
+        <Label x:Name="lblPrior"  HorizontalAlignment="Left" Margin="670,265,0,0" VerticalAlignment="Top" Width="54"/>
         <Label Content="Resterend" HorizontalAlignment="Left" Margin="550,313,0,0" VerticalAlignment="Top" Width="77"/>
-        <Label x:Name="lblResterend" Content="Label" HorizontalAlignment="Left" Margin="670,313,0,0" VerticalAlignment="Top"/>
-        <ListView x:Name="listViewPakkets" HorizontalAlignment="Left" Height="337" Margin="313,60,0,0" VerticalAlignment="Top" Width="191">
+        <Label x:Name="lblResterend"  HorizontalAlignment="Left" Margin="670,313,0,0" VerticalAlignment="Top"/>
+        <ListView x:Name="listViewPakkets" HorizontalAlignment="Left" Height="337" Margin="313,60,0,0" VerticalAlignment="Top" Width="190">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn/>
+
+                    <GridViewColumn Width="70" DisplayMemberBinding="{Binding PackageType}"/>
+                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding PriorString}"/>
+                                            
                 </GridView>
             </ListView.View>
         </ListView>

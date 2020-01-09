@@ -24,38 +24,156 @@ namespace HoWestPost.UI
     {
 
        
-        int[] tripTime = new int[] { 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90 };
+        int[] tripTime = new int[] {35, 40, 45, 50, 55, 60,65,70,75,80,85,90};
 
-        bool IsPrior = false;
+        bool isPrior;
+
+        string priorString;
+
+        int timeChoose;
 
         int PriorsTeller = 0;
+
+        private Delivery delivery;
+      
         private DeliveryProcessor deliveryProcessor;
-        ObservableCollection<Delivery> deliveries = new ObservableCollection<Delivery>();
+
+        private ObservableCollection<Delivery> deliveries = new ObservableCollection<Delivery>();
         public ObservableCollection<Delivery> Deliveries { get { return deliveries; } }
 
         public MainWindow()
         {
+
             InitializeComponent();
-            deliveryProcessor = new DeliveryProcessor();
+            SetUpSending();
+            timeChoose = 0;                
             listViewPakkets.ItemsSource = deliveries;
             cmbTripTime.ItemsSource = tripTime;
             cmbTripTime.SelectedIndex = 0;
+            //deliveryProcessor = new DeliveryProcessor();           
+            //deliveryProcessor.OnDelivering += PakketIsSending;
+
+        }
+
+        private void IsPriorOrNot()
+        {
+            if (chBoxPrior.IsChecked == true)
+            {
+                isPrior = true;
+            }
+            else
+                isPrior = false;
+        }
+
+        string StringforPrior()
+        {
+            if (isPrior)
+            {
+                priorString = "pakket (prior)";
+            }
+            else
+                priorString = "pakket";
+
+            return priorString;
         }
 
         private void BtnMini_Click(object sender, RoutedEventArgs e)
-        {
+        {           
+            IsPriorOrNot();
+            StringforPrior();
+            timeChoose = (int)cmbTripTime.SelectedValue;
+            var currentDelivery= new Delivery(PackageType.Mini, timeChoose, isPrior, priorString, 1);
+            deliveries.Add(currentDelivery);
+            //SetUpSending();
+        }
 
+        private void BtnStandard_Click(object sender, RoutedEventArgs e)
+        {
+            IsPriorOrNot();
+            StringforPrior();
+            timeChoose = (int)cmbTripTime.SelectedValue;
+            var currentDelivery = new Delivery(PackageType.Standard, timeChoose, isPrior, priorString, 1.2M);
+            deliveries.Add(currentDelivery);
+            SetUpSending();
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void BtnMaxi_Click(object sender, RoutedEventArgs e)
         {
+            IsPriorOrNot();
+            StringforPrior();
+            timeChoose = (int)cmbTripTime.SelectedValue;
+            var currentDelivery = new Delivery(PackageType.Maxi, timeChoose, isPrior, priorString, 1.5M);
+            deliveries.Add(currentDelivery);
+            //SetUpSending();
+        }
+
+        
+        private void SetUpSending()
+        {
+
+            if (deliveries.Count > 0)
+            {
+                deliveryProcessor = new DeliveryProcessor();
+                delivery = new Delivery(deliveries[0].PackageType, deliveries[0].TravelTime, deliveries[0].IsPrior, deliveries[0].PriorString, deliveries[0].Factor);
+                deliveryProcessor.CurrentDelivery = delivery;
+                lblPakketType.Content = delivery.PackageType;
+                var timeforLabel = Decimal.ToInt32(delivery.TravelTime * delivery.Factor);
+                lblTripTime.Content = $"{timeforLabel}min";
+                PrintPrior();
+                deliveryProcessor.StartSending();
+                deliveryProcessor.OnDelivering += PakketIsSending;
+                //deliveryProcessor.OnDelivering += Reset;
+            }
 
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void PrintPrior()
         {
+            if (delivery.IsPrior == true)
+                lblPrior.Content = "Ja";
+            else
+                lblPrior.Content = "Nee";
+        }
+
+        private void PakketIsSending(object sender, int passedTime, int remainingtime, int totalTimeSendingInt)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                //lblResterend.Content = ((DeliveryProcessor)sender).RemainingTime;
+
+                lblResterend.Content = $"{remainingtime}min";
+                prgBarTime.Maximum = totalTimeSendingInt;
+                prgBarTime.Value = passedTime;
+            }
+            else
+            {
+                //dispatch to MAIN thread
+                Dispatcher.Invoke(() => { PakketIsSending(sender, passedTime, remainingtime, totalTimeSendingInt); });
+            }
 
         }
+
+        private void Reset(object sender, int passedTime, int remainingtime, int totalTimeSendingInt)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                prgBarTime.Value = 0;
+                SetUpSending();
+            }
+
+            else
+            {
+                //dispatch to MAIN thread
+                Dispatcher.Invoke(() => { Reset(sender, passedTime, remainingtime, totalTimeSendingInt); });
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            deliveryProcessor.Stop();
+            Close();
+        }
+
     }
 }
