@@ -16,10 +16,7 @@ namespace HoWestPost.Domain
         private decimal totalTimeSending = 0M;
 
         private int remainingTime;
-
-       
-
-
+      
         private Delivery currentDelivery;
         public Delivery CurrentDelivery
         {
@@ -27,14 +24,8 @@ namespace HoWestPost.Domain
             set { currentDelivery = value; }
         }
 
-
         private int totalTimeSendingInt = 0;
-        //public decimal TotalTimeSending
-        //{
-        //    get { return totalTimeSending; }
-        //}
-
-
+     
         public event PakketSendingEventHandler OnDelivering;
         public event PakketSendingEventHandler OnSend;
 
@@ -42,11 +33,7 @@ namespace HoWestPost.Domain
         {
             passedTime = 0;
             isSending = false;   
-            //if (currentDelivery != null)
-            //{ 
-            //totalTimeSending = currentDelivery.TravelTime / 10 * currentDelivery.Factor;
-            //totalTimeSendingInt = Decimal.ToInt32(totalTimeSending);
-            //}
+        
         }
 
         public void StartSending()
@@ -73,33 +60,41 @@ namespace HoWestPost.Domain
 
         private void Send()
         {
+            if (currentDelivery.IsPrior)
+            {
+                Thread.Sleep(90);
+            }
+            else
+                // 10 minutes(label) = 1 second
             Thread.Sleep(100);
-
            
                 if(passedTime < totalTimeSendingInt) { 
-                passedTime ++;
+                  passedTime ++;
                 }
                 totalTimeSending = currentDelivery.TravelTime * currentDelivery.Factor;
                 totalTimeSendingInt = Decimal.ToInt32(totalTimeSending);
                 remainingTime = totalTimeSendingInt - passedTime;
-           
-                OnDelivering?.Invoke(this, passedTime, remainingTime, totalTimeSendingInt);
-                 
+
+               if (OnDelivering != null)
+               { 
+                 OnDelivering?.Invoke(this, passedTime, remainingTime, totalTimeSendingInt);
+               }
+
+               if (passedTime == totalTimeSendingInt)
+               {
+                  if (OnSend != null)
+                  {
+                    OnSend?.Invoke(this, passedTime, remainingTime, totalTimeSendingInt);
+                  }
+
+               }
         }
 
         public void Stop()
-        {
-           
-
+        {           
             isSending = false;
             senderThread = null;
         }
-
-        public void AddToList(object sender)
-        {
-
-        }
-
 
 
     }
