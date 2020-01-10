@@ -32,7 +32,7 @@ namespace HoWestPost.UI
 
         int timeChoose;
 
-        int PriorsTeller = 0;
+        int counterForSetUpSending = 0;
 
         private Delivery delivery;
       
@@ -50,10 +50,11 @@ namespace HoWestPost.UI
             listViewPakkets.ItemsSource = deliveries;
             cmbTripTime.ItemsSource = tripTime;
             cmbTripTime.SelectedIndex = 0;
-            //deliveryProcessor = new DeliveryProcessor();           
-            //deliveryProcessor.OnDelivering += PakketIsSending;
-
+           
+           
         }
+
+      
 
         private void IsPriorOrNot()
         {
@@ -78,36 +79,47 @@ namespace HoWestPost.UI
         }
 
         private void BtnMini_Click(object sender, RoutedEventArgs e)
-        {           
+        {
+            counterForSetUpSending++;
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
             var currentDelivery= new Delivery(PackageType.Mini, timeChoose, isPrior, priorString, 1);
             deliveries.Add(currentDelivery);
-            //SetUpSending();
+            if (counterForSetUpSending == 1)
+            {
+                SetUpSending();
+            }
+
         }
 
         private void BtnStandard_Click(object sender, RoutedEventArgs e)
         {
+            counterForSetUpSending++;
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
             var currentDelivery = new Delivery(PackageType.Standard, timeChoose, isPrior, priorString, 1.2M);
             deliveries.Add(currentDelivery);
-            SetUpSending();
-
+            if (counterForSetUpSending == 1)
+            {
+                SetUpSending();
+            }
         }
 
         private void BtnMaxi_Click(object sender, RoutedEventArgs e)
         {
+            counterForSetUpSending++;
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
             var currentDelivery = new Delivery(PackageType.Maxi, timeChoose, isPrior, priorString, 1.5M);
             deliveries.Add(currentDelivery);
-            //SetUpSending();
+            if (counterForSetUpSending == 1)
+            {
+                SetUpSending();
+            }
         }
-
         
         private void SetUpSending()
         {
@@ -121,9 +133,11 @@ namespace HoWestPost.UI
                 var timeforLabel = Decimal.ToInt32(delivery.TravelTime * delivery.Factor);
                 lblTripTime.Content = $"{timeforLabel}min";
                 PrintPrior();
+                DeleteFromList();
+
                 deliveryProcessor.StartSending();
                 deliveryProcessor.OnDelivering += PakketIsSending;
-                //deliveryProcessor.OnDelivering += Reset;
+                deliveryProcessor.OnSend += Reset;
             }
 
         }
@@ -136,12 +150,18 @@ namespace HoWestPost.UI
                 lblPrior.Content = "Nee";
         }
 
+        private void DeleteFromList()
+        {
+            if (deliveries.Count > 0)
+            {
+                deliveries.RemoveAt(0);
+            }
+        }
         private void PakketIsSending(object sender, int passedTime, int remainingtime, int totalTimeSendingInt)
         {
             if (Dispatcher.CheckAccess())
             {
-                //lblResterend.Content = ((DeliveryProcessor)sender).RemainingTime;
-
+               
                 lblResterend.Content = $"{remainingtime}min";
                 prgBarTime.Maximum = totalTimeSendingInt;
                 prgBarTime.Value = passedTime;
@@ -158,8 +178,14 @@ namespace HoWestPost.UI
         {
             if (Dispatcher.CheckAccess())
             {
+                deliveryProcessor.Stop();
                 prgBarTime.Value = 0;
                 SetUpSending();
+                if(deliveries.Count == 0)
+                {
+                    counterForSetUpSending = 0;
+                }
+
             }
 
             else
@@ -175,5 +201,9 @@ namespace HoWestPost.UI
             Close();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            imgPakket.Source = new BitmapImage(new Uri("assets/images/pakket.png", UriKind.Relative));
+        }
     }
 }

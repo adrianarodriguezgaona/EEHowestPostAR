@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HoWestPost.UI"
         mc:Ignorable="d"
-        Title="HoWest Post" Height="450" Width="800">
+        Title="HoWest Post" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Label Content="Pakket versturen" HorizontalAlignment="Left" Margin="57,10,0,0" VerticalAlignment="Top" Width="108"/>
         <Label Content="Reistijd" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="-2.437,-1.133"/>
@@ -16,6 +16,7 @@
         <Button x:Name="btnMaxi" Content="Maxi" HorizontalAlignment="Left" Margin="187,180,0,0" VerticalAlignment="Top" Width="52" Click="BtnMaxi_Click"/>
         <Label Content="In behandeling" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Width="109"/>
         <Label Content="Onderweg" HorizontalAlignment="Left" Margin="633,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.708,-0.539" Width="102"/>
+
         <ProgressBar x:Name="prgBarTime" HorizontalAlignment="Left" Height="24" Margin="550,136,0,0" VerticalAlignment="Top" Width="210"/>
         <Label Content="Totale reistijd" HorizontalAlignment="Left" Margin="550,195,0,0" VerticalAlignment="Top" Width="86"/>
         <Label x:Name="lblTripTime" HorizontalAlignment="Left" Margin="670,195,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.521,0.945" Width="90"/>
@@ -31,9 +32,10 @@
 
                     <GridViewColumn Width="70" DisplayMemberBinding="{Binding PackageType}"/>
                     <GridViewColumn Width="120" DisplayMemberBinding="{Binding PriorString}"/>
-                                            
+
                 </GridView>
             </ListView.View>
         </ListView>
+        <Image  x:Name="imgPakket" HorizontalAlignment="Left" Height="80" Margin="589,35,0,0" VerticalAlignment="Top" Width="154" />
     </Grid>
 </Window>
