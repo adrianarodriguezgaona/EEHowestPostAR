@@ -4,7 +4,9 @@ using System.Threading;
 
 namespace HoWestPost.Domain
 {
-    public delegate void PakketSendingEventHandler(object sender, int passedTime, int remainingTime, int totalTimeSendingInt);
+    // nu krijgt de delegate en object sender en een delyveryEventArgs, naam aangepast  naar DeliveryEventHandler
+
+    public delegate void DeliveryEventHandler(object sender, DeliveryEventArgs e);
     public class DeliveryProcessor
     {
         //TODO proces deliveries...  
@@ -26,8 +28,8 @@ namespace HoWestPost.Domain
 
         private int totalTimeSendingInt = 0;
      
-        public event PakketSendingEventHandler OnDelivering;
-        public event PakketSendingEventHandler OnSend;
+        public event DeliveryEventHandler OnDelivering;
+        public event DeliveryEventHandler OnSend;
 
         public DeliveryProcessor()
         {
@@ -42,7 +44,8 @@ namespace HoWestPost.Domain
             {
                 isSending = true;
                 senderThread = new Thread(() => { SendingProcedure(); });
-              
+
+                //door de thread als background in te stellen wordt het 'onderdeel' van de main thread
                 senderThread.IsBackground = true;
 
                 senderThread.Start();
@@ -58,15 +61,12 @@ namespace HoWestPost.Domain
             }
         }
 
+        // method send bijna volledig aangepast = Ondelivering kan invoke zijn als passedTime < totamTimeSendingInt is en OnSend als passedTime == totalTimeSendingInt
         private void Send()
-        {
-            if (currentDelivery.IsPrior)
-            {
-                Thread.Sleep(90);
-            }
-            else
-                // 10 minutes(label) = 1 second
-            Thread.Sleep(100);
+        {           
+                // 10 "minutes" = 1 second
+               
+                Thread.Sleep(100);
            
                 if(passedTime < totalTimeSendingInt) { 
                   passedTime ++;
@@ -77,14 +77,14 @@ namespace HoWestPost.Domain
 
                if (OnDelivering != null)
                { 
-                 OnDelivering?.Invoke(this, passedTime, remainingTime, totalTimeSendingInt);
+                 OnDelivering?.Invoke(this, new DeliveryEventArgs(passedTime,remainingTime,totalTimeSendingInt));
                }
 
                if (passedTime == totalTimeSendingInt)
                {
                   if (OnSend != null)
                   {
-                    OnSend?.Invoke(this, passedTime, remainingTime, totalTimeSendingInt);
+                    OnSend?.Invoke(this, new DeliveryEventArgs(passedTime, remainingTime, totalTimeSendingInt));
                   }
 
                }
