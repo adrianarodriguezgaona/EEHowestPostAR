@@ -43,15 +43,11 @@ namespace HoWestPost.UI
 
         public MainWindow()
         {
-
             InitializeComponent();
-            SetUpSending();
             timeChoose = 0;                
             listViewPakkets.ItemsSource = deliveries;
             cmbTripTime.ItemsSource = tripTime;
-            cmbTripTime.SelectedIndex = 0;
-           
-           
+            cmbTripTime.SelectedIndex = 0;           
         }
 
       
@@ -78,14 +74,25 @@ namespace HoWestPost.UI
             return priorString;
         }
 
+        // aanpassing = als prior gekozen is dan is standaard travelTimeToDestination =30, SetUpSending wordt hier (niet meer in de constructor) uitgevoerd enkel als
+        // counterForSetUpSending == 1 ( dit telt ook voor BtnStandaard and BtnMaxi)
         private void BtnMini_Click(object sender, RoutedEventArgs e)
         {
             counterForSetUpSending++;
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
-            var currentDelivery= new Delivery(PackageType.Mini, timeChoose, isPrior, priorString, 1);
-            deliveries.Add(currentDelivery);
+            if (isPrior)
+            {
+                var currentDeliveryPrior = new Delivery(PackageType.Mini, 30 , isPrior, priorString, 1);
+                deliveries.Add(currentDeliveryPrior);
+            }
+            else
+            {
+                var currentDelivery = new Delivery(PackageType.Mini, timeChoose, isPrior, priorString, 1);
+                deliveries.Add(currentDelivery);
+            }
+           
             if (counterForSetUpSending == 1)
             {
                 SetUpSending();
@@ -99,8 +106,17 @@ namespace HoWestPost.UI
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
-            var currentDelivery = new Delivery(PackageType.Standard, timeChoose, isPrior, priorString, 1.2M);
-            deliveries.Add(currentDelivery);
+            if (isPrior)
+            {
+                var currentDeliveryPrior= new Delivery(PackageType.Standard, 30 , isPrior, priorString, 1.2M);
+                deliveries.Add(currentDeliveryPrior);
+            }
+            else
+            {
+                var currentDelivery = new Delivery(PackageType.Standard, timeChoose, isPrior, priorString, 1.2M);
+                deliveries.Add(currentDelivery);
+            }
+           
             if (counterForSetUpSending == 1)
             {
                 SetUpSending();
@@ -113,29 +129,41 @@ namespace HoWestPost.UI
             IsPriorOrNot();
             StringforPrior();
             timeChoose = (int)cmbTripTime.SelectedValue;
-            var currentDelivery = new Delivery(PackageType.Maxi, timeChoose, isPrior, priorString, 1.5M);
-            deliveries.Add(currentDelivery);
+            if (isPrior)
+            {
+                var currentDeliveryPrior = new Delivery(PackageType.Maxi, 30 , isPrior, priorString, 1.5M);
+                deliveries.Add(currentDeliveryPrior);
+            }
+            else
+            {
+                var currentDelivery = new Delivery(PackageType.Maxi, timeChoose, isPrior, priorString, 1.5M);
+                deliveries.Add(currentDelivery);
+            }
+           
             if (counterForSetUpSending == 1)
             {
                 SetUpSending();
             }
         }
-        
+
+        // StartSending van deliveryProcessor wordt hiet uitgevoerd ( niet meer in constructor), delivery en deliveryProcessor hier geïnstantieerd , method DeletefromList
         private void SetUpSending()
         {
 
             if (deliveries.Count > 0)
             {
+                prgBarTime.Value = 0;
                 deliveryProcessor = new DeliveryProcessor();
                 delivery = new Delivery(deliveries[0].PackageType, deliveries[0].TravelTime, deliveries[0].IsPrior, deliveries[0].PriorString, deliveries[0].Factor);
                 deliveryProcessor.CurrentDelivery = delivery;
                 lblPakketType.Content = delivery.PackageType;
                 var timeforLabel = Decimal.ToInt32(delivery.TravelTime * delivery.Factor);
-                lblTripTime.Content = $"{timeforLabel}min";
+                lblTripTime.Content = $"{timeforLabel} min";
                 PrintPrior();
                 DeleteFromList();
 
                 deliveryProcessor.StartSending();
+                //invocation lijst:
                 deliveryProcessor.OnDelivering += PakketIsSending;
                 deliveryProcessor.OnSend += Reset;
             }
@@ -150,6 +178,7 @@ namespace HoWestPost.UI
                 lblPrior.Content = "Nee";
         }
 
+        // FIFO dus eerste IN pakket (index 0) wordt eerst OUT
         private void DeleteFromList()
         {
             if (deliveries.Count > 0)
@@ -157,42 +186,49 @@ namespace HoWestPost.UI
                 deliveries.RemoveAt(0);
             }
         }
-        private void PakketIsSending(object sender, int passedTime, int remainingtime, int totalTimeSendingInt)
+        // Method zo goed als volledig aangepast: nu krijgt als parameter een object sender en een DeliveryEventArgs en wordt uitgevoerd door Ondelivering event
+        private void PakketIsSending(object sender, DeliveryEventArgs e)
         {
             if (Dispatcher.CheckAccess())
             {
-               
-                lblResterend.Content = $"{remainingtime}min";
-                prgBarTime.Maximum = totalTimeSendingInt;
-                prgBarTime.Value = passedTime;
+                lblResterend.Content = $"{e.RemainingTime} min";
+                prgBarTime.Maximum = e.TotalTimeSendingInt;
+                prgBarTime.Value = e.PassedTime;
             }
             else
             {
                 //dispatch to MAIN thread
-                Dispatcher.Invoke(() => { PakketIsSending(sender, passedTime, remainingtime, totalTimeSendingInt); });
+                Dispatcher.Invoke(() => { PakketIsSending(sender, e); });
             }
 
         }
 
-        private void Reset(object sender, int passedTime, int remainingtime, int totalTimeSendingInt)
+        // Nieuwe methode = wordt uitgevoerd door OnSend event 
+        private void Reset(object sender, DeliveryEventArgs e)
         {
             if (Dispatcher.CheckAccess())
             {
-                deliveryProcessor.Stop();
-                prgBarTime.Value = 0;
-                SetUpSending();
-                if(deliveries.Count == 0)
+                deliveryProcessor.Stop();               
+                if (deliveries.Count == 0)
                 {
                     counterForSetUpSending = 0;
                 }
-
+                SetUpSending();
+              
             }
 
             else
             {
                 //dispatch to MAIN thread
-                Dispatcher.Invoke(() => { Reset(sender, passedTime, remainingtime, totalTimeSendingInt); });
+                Dispatcher.Invoke(() => { Reset(sender, e); });
             }
+        }
+
+
+        // afbeelding wordt getoond bij event window loaded
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            imgPakket.Source = new BitmapImage(new Uri("assets/images/pakket.png", UriKind.Relative));
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -201,9 +237,5 @@ namespace HoWestPost.UI
             Close();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            imgPakket.Source = new BitmapImage(new Uri("assets/images/pakket.png", UriKind.Relative));
-        }
     }
 }

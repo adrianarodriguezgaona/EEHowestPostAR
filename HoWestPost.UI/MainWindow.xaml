@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HoWestPost.UI"
         mc:Ignorable="d"
-        Title="HoWest Post" Height="450" Width="800" Loaded="Window_Loaded">
-    <Grid>
+        Title="HoWest Post" Height="450" Width="800" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid Background="#FFC5CBC5">
         <Label Content="Pakket versturen" HorizontalAlignment="Left" Margin="57,10,0,0" VerticalAlignment="Top" Width="108"/>
         <Label Content="Reistijd" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="-2.437,-1.133"/>
         <ComboBox x:Name="cmbTripTime" HorizontalAlignment="Left" Margin="119,67,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.36,-0.545"/>
         <CheckBox  x:Name="chBoxPrior"  Content="Prior?" HorizontalAlignment="Left" Margin="119,124,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnMini" Content="Mini" HorizontalAlignment="Left" Margin="23,180,0,0" VerticalAlignment="Top" Width="48" Click="BtnMini_Click"/>
-        <Button x:Name="btnStandard" Content="Standaard" HorizontalAlignment="Left" Margin="94,180,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.928,1.323" Click="BtnStandard_Click"/>
-        <Button x:Name="btnMaxi" Content="Maxi" HorizontalAlignment="Left" Margin="187,180,0,0" VerticalAlignment="Top" Width="52" Click="BtnMaxi_Click"/>
+        <Button x:Name="btnMini" Content="Mini" HorizontalAlignment="Left" Margin="23,180,0,0" VerticalAlignment="Top" Width="48" Click="BtnMini_Click" Background="#FF47A064"/>
+        <Button x:Name="btnStandard" Content="Standaard" HorizontalAlignment="Left" Margin="94,180,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.928,1.323" Click="BtnStandard_Click" Background="#FF5577A8"/>
+        <Button x:Name="btnMaxi" Content="Maxi" HorizontalAlignment="Left" Margin="187,180,0,0" VerticalAlignment="Top" Width="52" Click="BtnMaxi_Click" Background="#FFB0431A"/>
         <Label Content="In behandeling" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Width="109"/>
         <Label Content="Onderweg" HorizontalAlignment="Left" Margin="633,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.708,-0.539" Width="102"/>
 
@@ -26,12 +26,12 @@
         <Label x:Name="lblPrior"  HorizontalAlignment="Left" Margin="670,265,0,0" VerticalAlignment="Top" Width="54"/>
         <Label Content="Resterend" HorizontalAlignment="Left" Margin="550,313,0,0" VerticalAlignment="Top" Width="77"/>
         <Label x:Name="lblResterend"  HorizontalAlignment="Left" Margin="670,313,0,0" VerticalAlignment="Top"/>
-        <ListView x:Name="listViewPakkets" HorizontalAlignment="Left" Height="337" Margin="313,60,0,0" VerticalAlignment="Top" Width="190">
+        <ListView x:Name="listViewPakkets" HorizontalAlignment="Left" Height="337" Margin="313,60,0,0" VerticalAlignment="Top" Width="190" Background="#FFACC5AA">
             <ListView.View>
                 <GridView>
 
-                    <GridViewColumn Width="70" DisplayMemberBinding="{Binding PackageType}"/>
-                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding PriorString}"/>
+                    <GridViewColumn Width="70" DisplayMemberBinding="{Binding PackageType}" Header="Soort pakket"/>
+                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding PriorString}" Header="Prior?"/>
 
                 </GridView>
             </ListView.View>
